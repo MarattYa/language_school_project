@@ -1,0 +1,169 @@
+/* ===============================
+   Global styles
+   =============================== */
+
+body {
+  background-color: #f6f4ef;
+  color: #212529;
+}
+
+/* Ограничение ширины контента */
+.container {
+  max-width: 1140px;
+}
+
+/* ===============================
+   Header
+   =============================== */
+
+header {
+  background-color: #ffffff;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e85d8c;
+}
+
+.navbar-brand:hover {
+  color: #d94a7a;
+}
+
+/* ===============================
+   Hero section
+   =============================== */
+
+section:first-of-type h1 {
+  color: #212529;
+}
+
+/* ===============================
+   Cards
+   =============================== */
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.card h5 {
+  margin-bottom: 0.75rem;
+}
+
+/* ===============================
+   Courses
+   =============================== */
+
+#courses {
+  background-color: #f6f4ef;
+}
+
+.course-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  height: 100%;
+  box-shadow: 0 6px 18px rgba(232, 93, 140, 0.12);
+}
+
+/* ===============================
+   Tutors table
+   =============================== */
+
+table thead {
+  background-color: #fde7ef;
+}
+
+table tbody tr {
+  background-color: #ffffff;
+}
+
+/* ===============================
+   Buttons (Pink theme)
+   =============================== */
+
+.btn-primary {
+  background-color: #e85d8c;
+  border-color: #e85d8c;
+  border-radius: 0.5rem;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #d94a7a;
+  border-color: #d94a7a;
+}
+
+.btn-outline-primary {
+  color: #e85d8c;
+  border-color: #e85d8c;
+}
+
+.btn-outline-primary:hover {
+  background-color: #e85d8c;
+  color: #ffffff;
+}
+
+/* ===============================
+   Pagination
+   =============================== */
+
+.page-link {
+  color: #e85d8c;
+}
+
+.page-link:hover {
+  color: #d94a7a;
+}
+
+.page-item.active .page-link {
+  background-color: #e85d8c;
+  border-color: #e85d8c;
+}
+
+/* ===============================
+   Alerts
+   =============================== */
+
+.alert-success {
+  background-color: #fde7ef;
+  color: #8a2c4a;
+  border-color: #f5c2d3;
+}
+
+/* ===============================
+   Footer
+   =============================== */
+
+.footer {
+  background-color: #ffffff;
+}
+
+.footer-link {
+  color: #6c757d;
+  text-decoration: none;
+  margin: 0 0.25rem;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Social icons */
+.social-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f6f4ef;
+  color: #212529;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.social-icon:hover {
+  background-color: #e85d8c;
+  color: #ffffff;
+}
