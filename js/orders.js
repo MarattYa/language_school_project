@@ -1,22 +1,8 @@
-import {API_KEY,BASE_URL, apiGet} from './api.js'
-
+import {API_KEY,BASE_URL, apiGet,apiPost} from './api.js'
 
 // Create (Создание заявки)
-export async function createOrder(orderData){
-    try {
-        const response = await fetch(`${BASE_URL}/orders?api_key=${API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(orderData)         
-        });
-
-        if(!response.ok) throw new Error('Ошибка создания заявки');
-        return await response.json();
-    } catch(error) {
-        console.error(error)
-    }
+export async function createOrder(orderData) {
+  return await apiPost('/orders', orderData);
 }
 
 // Read
@@ -35,7 +21,7 @@ export async function updateOrder(id, orderData){
         const response = await fetch(`${BASE_URL}/orders/${id}?api_key=${API_KEY}`, {
             method: 'PUT',
             headers: {
-                'Content-Type':'aplication/json'
+                'Content-Type':'application/json'
             },
             body: JSON.stringify(orderData)
         });
@@ -43,6 +29,7 @@ export async function updateOrder(id, orderData){
         return await response.json(); 
     } catch(error) {
         console.error(error);
+        return null;
     }
 }
 

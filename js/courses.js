@@ -1,8 +1,15 @@
-const coursesList = document.getElementById('courses-list');
+import { apiGet } from './api.js';
+import { createOrder } from './orders.js';
 
+const coursesList = document.getElementById('courses-list');
+const paginationContainer = document.getElementById('courses-pagination');
+
+let coursesData = []; // Все курсы
+let currentPage = 1;
+const itemsPerPage = 5;
 
 // html карточки
-function createCourseCard(course) {
+export function createCourseCard(course) {
     return `
     <div class="col-md-6 col-lg-4 mb-4">
         <div class ="course-card h-100 d-flex flex-column justify-content-between">
@@ -35,41 +42,65 @@ function createCourseCard(course) {
     `;
 }
 
-// Список курсов
-
-function renderCourse(courses) {
+// Отображение текущей страницы
+function renderCurrentPage() {
     coursesList.innerHTML = '';
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = coursesData.slice(start,end);
 
-    courses.forEach(course => {
-        coursesList.insertAdjacentHTML(
-            'beforeend',
-            createCourseCard(course)
-        );
+    pageItems.forEach(course => {
+        coursesList.insertAdjacentHTML('beforeend', createCourseCard(course));
     });
 
+    renderPagination();
+}
+
+//Рендер пагинации Bootstrap
+function renderPagination() {
+    paginationContainer.innerHTML= '';
+    const totalPages = Math.ceil(coursesData.length/itemsPerPage);
+
+    for(let i = 1; i <= totalPages; i++) {
+        const active = i === currentPage ? 'active' : '';
+        paginationContainer.insertAdjacentHTML('beforeend',`
+            <li class="page-item ${active}">
+                <a class="page-link" href="#">${i}</a>
+            </li>
+            `)
+    }
+
+    const pageLinks = paginationContainer.querySelectorAll('.page-link');
+    pageLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentPage = parseInt(e.target.textContent);
+            renderCurrentPage();
+        });
+    });
 }
 
 // Загрузка курсов из API
 
-async function loadCourses() {
+export async function loadCourses() {
     try {
         const courses = await apiGet('/courses');
-        renderCourse(courses);
+        coursesData = courses;
+        renderCurrentPage();
     } catch (error) {
         console.error(error);
     }
 }
 
-import { createOrder } from './orders.js';
-
+//Обработчик кнопки "Подать заявку"
 coursesList.addEventListener('click', async (e) => {
     if(e.target.tagName === 'BUTTON' && e.target.dataset.courseId) {
         const courseId = e.target.dataset.courseId;
 
         const orderData = {
             courseId: courseId,
-            userName: promt("Введите ваше имя"),
-            userEmail: promt("Введите email")
+            userName: prompt("Введите ваше имя"),
+            userEmail: prompt("Введите email")
         };
 
         const newOrder = await createOrder(orderData);

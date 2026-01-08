@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>LinguaSpace — Личный кабинет</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="border-bottom bg-white">
+  <nav class="navbar navbar-expand-lg container py-3">
+    <a class="navbar-brand fw-bold" href="#">LinguaSpace</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainMenu">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="index.html#courses">Курсы</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#tutors">Репетиторы</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#about">О нас</a></li>
+        <li class="nav-item ms-lg-3"><a class="btn btn-primary" href="index.html#courses">Подать заявку</a></li>
+        <li class="nav-item ms-lg-3"><a class="nav-link" href="account.html">Личный кабинет</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="container py-5">
+  <h1 class="fw-bold mb-4 text-center">Личный кабинет</h1>
+  <p class="text-center text-muted mb-5">
+    Здесь вы можете просматривать свои заявки, редактировать их и удалять.
+  </p>
+
+  <!-- ================= ORDERS TABLE ================= -->
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Курс</th>
+          <th>Имя</th>
+          <th>Email</th>
+          <th>Статус</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="orders-list">
+        <!-- JS подставит заявки пользователя -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================= EDIT MODAL ================= -->
+  <div class="modal fade" id="editOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Редактировать заявку</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-order-form">
+            <input type="hidden" id="edit-order-id">
+            <div class="mb-3">
+              <label for="edit-user-name" class="form-label">Имя</label>
+              <input type="text" class="form-control" id="edit-user-name" required>
+            </div>
+            <div class="mb-3">
+              <label for="edit-user-email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="edit-user-email" required>
+            </div>
+            <div class="mb-3">
+              <label for="edit-course-name" class="form-label">Курс</label>
+              <input type="text" class="form-control" id="edit-course-name" disabled>
+            </div>
+            <div class="mb-3">
+              <label for="edit-status" class="form-label">Статус</label>
+              <select class="form-select" id="edit-status">
+                <option value="new">Новая</option>
+                <option value="in_progress">В процессе</option>
+                <option value="completed">Завершена</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer border-top">
+  <div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div class="text-muted small text-center text-md-start">
+        © 2026 LinguaSpace ·
+        <a href="#" class="footer-link">Imprint</a> ·
+        <a href="#" class="footer-link">Terms & Conditions</a> ·
+        <a href="#" class="footer-link">Privacy Statement</a> ·
+        <a href="#" class="footer-link">Do Not Sell or Share My Personal Information</a>
+      </div>
+      <div class="d-flex gap-3">
+        <a href="#" class="social-icon">F</a>
+        <a href="#" class="social-icon">▶</a>
+        <a href="#" class="social-icon">◎</a>
+        <a href="#" class="social-icon">in</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="js/orders.js"></script>
+<script type="module" src="js/account.js"></script>
+
+</body>
+</html>
