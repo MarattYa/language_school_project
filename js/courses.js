@@ -59,3 +59,20 @@ async function loadCourses() {
         console.error(error);
     }
 }
+
+import { createOrder } from './orders.js';
+
+coursesList.addEventListener('click', async (e) => {
+    if(e.target.tagName === 'BUTTON' && e.target.dataset.courseId) {
+        const courseId = e.target.dataset.courseId;
+
+        const orderData = {
+            courseId: courseId,
+            userName: promt("Введите ваше имя"),
+            userEmail: promt("Введите email")
+        };
+
+        const newOrder = await createOrder(orderData);
+        if (newOrder) alert('Заявка успешно создана');
+    }
+});
