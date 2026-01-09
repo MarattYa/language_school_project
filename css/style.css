@@ -167,3 +167,7 @@ table tbody tr {
   background-color: #e85d8c;
   color: #ffffff;
 }
+
+.tutor-selected {
+  background-color: #d0ebff;
+}

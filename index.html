@@ -122,6 +122,56 @@
   </div>
 </section>
 
+<!-- ================= MODAL ================= -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <form class="modal-content" id="order-form">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Заявка на курс</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <label class="form-label">Курс</label>
+        <input class="form-control mb-2" id="course-name" readonly>
+
+        <label class="form-label">Преподаватель</label>
+        <input class="form-control mb-2" id="teacher-name" readonly>
+
+        <label class="form-label">Дата начала</label>
+        <input type="date" class="form-control mb-2" id="start-date">
+
+        <label class="form-label">Время занятий</label>
+        <select class="form-select mb-2" id="lesson-time" disabled></select>
+
+        <label class="form-label">Количество студентов</label>
+        <input type="number" class="form-control mb-2"
+               id="students"
+               min="1" max="20" value="1">
+
+        <div id="options" class="mb-3">
+          <!-- чекбоксы опций -->
+        </div>
+
+        <div class="fw-bold">
+          Итоговая стоимость:
+          <span id="total-price">0</span> ₽
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button class="btn btn-primary" type="submit">Отправить</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
 <!-- ================= COURSES ================= -->
 <section id="courses" class="bg-light py-5">
   <div class="container">
@@ -199,7 +249,6 @@
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>Фото</th>
           <th>Имя</th>
           <th>Уровень</th>
           <th>Языки</th>
@@ -214,6 +263,8 @@
     </table>
   </div>
 </section>
+
+
 
 <!-- ================= FOOTER ================= -->
 <footer class="footer border-top">

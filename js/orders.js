@@ -1,49 +1,33 @@
-import {API_KEY,BASE_URL, apiGet,apiPost} from './api.js'
+// orders.js
+import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 
-// Create (Создание заявки)
+// Создание заявки
 export async function createOrder(orderData) {
-  return await apiPost('/orders', orderData);
+    return await apiPost('/orders', orderData);
 }
 
-// Read
+// Получение всех заявок пользователя
 export async function getOrders() {
     try {
         return await apiGet('/orders');
     } catch (error) {
-        console.error(error);
+        console.error('Ошибка получения заявок:', error);
         return [];
     }
 }
 
-// Update
-export async function updateOrder(id, orderData){
-    try {
-        const response = await fetch(`${BASE_URL}/orders/${id}?api_key=${API_KEY}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(orderData)
-        });
-        if(!response.ok) throw new Error('Ошибка при обновлении заказа');
-        return await response.json(); 
-    } catch(error) {
-        console.error(error);
-        return null;
-    }
+// Обновление заявки
+export async function updateOrder(id, orderData) {
+    return await apiPut(`/orders/${id}`, orderData);
 }
 
-// Delete
+// Удаление заявки
 export async function deleteOrder(id) {
     try {
-        const response = await fetch(`${BASE_URL}/orders/${id}?api_key=${API_KEY}`, {
-            method: 'DELETE',
-        });
-        if(!response.ok) throw new Error('Ошибка при удалении заявки');
+        await apiDelete(`/orders/${id}`);
         return true;
     } catch (error) {
-        console.error(error)
+        console.error('Ошибка удаления заявки:', error);
         return false;
     }
 }
-
