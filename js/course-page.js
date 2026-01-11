@@ -13,7 +13,6 @@ if (!courseId) {
 /* ================== DOM ================== */
 const nameEl = document.getElementById('course-name');
 const descEl = document.getElementById('course-description');
-const languageEl = document.getElementById('course-language');
 const levelEl = document.getElementById('course-level');
 const durationEl = document.getElementById('course-duration');
 const weekLengthEl = document.getElementById('course-week-length');
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         nameEl.textContent = course.name;
         descEl.textContent = course.description || 'Описание отсутствует';
-        languageEl.textContent = course.language;
         levelEl.textContent = course.level;
         durationEl.textContent = course.total_length;
         weekLengthEl.textContent = course.week_length;

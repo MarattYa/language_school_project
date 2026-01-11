@@ -4,6 +4,7 @@ const coursesList = document.getElementById('courses-list');
 const paginationContainer = document.getElementById('courses-pagination');
 
 let coursesData = [];
+let filteredCourses = [];
 let currentPage = 1;
 const itemsPerPage = 6;
 
@@ -15,6 +16,7 @@ export function createCourseCard(course) {
                 <div>
                     <h5 class="fw-bold mb-2">${course.name}</h5>
                     <p class="text-muted mb-2">Уровень: ${course.level}</p>
+                    <p class="text-muted mb-2">Количество часов в неделю: ${course.week_length} ч. </p>
                     <p class="text-muted">Длительность: ${course.total_length} недель</p>
                 </div>
                 <a href="course.html?id=${course.id}" class="btn btn-primary mt-3">
@@ -29,7 +31,7 @@ export function createCourseCard(course) {
 function renderCurrentPage() {
     coursesList.innerHTML = '';
     const start = (currentPage-1) * itemsPerPage;
-    const pageItems = coursesData.slice(start, start + itemsPerPage);
+    const pageItems = filteredCourses.slice(start, start + itemsPerPage);
 
     pageItems.forEach(course => {
         coursesList.insertAdjacentHTML('beforeend', createCourseCard(course));
@@ -40,7 +42,7 @@ function renderCurrentPage() {
 
 function renderPagination() {
     paginationContainer.innerHTML = '';
-    const totalPages = Math.ceil(coursesData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
 
     for(let i=1;i<=totalPages;i++){
         const active = i===currentPage ? 'active' : '';
@@ -60,11 +62,38 @@ function renderPagination() {
     });
 }
 
+// Фильтрация курсов
+function applyFilters(name='',level='') {
+    filteredCourses = coursesData.filter(course => {
+        const matchesName = course.name.toLowerCase().includes(name.toLowerCase());
+        const matchesLevel = level ? course.level === level:true;
+        return matchesName && matchesLevel;
+    });
+    currentPage = 1
+    renderCurrentPage();
+}
+
 // Загрузка курсов
 export async function loadCourses() {
     try {
         coursesData = await apiGet('/courses');
+        filteredCourses = [...coursesData];
         renderCurrentPage();
+
+        // Подключением фильтры формы
+        const searchInput = document.querySelector('#courses input[type="text"]');
+        const levelSelect = document.querySelector('#courses select');
+
+        const form = searchInput.closest('form');
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            applyFilters(searchInput.value, levelSelect.value);
+        });
+
+        // Фильтр в реальном времени при вводе текста
+        searchInput.addEventListener('input', () => applyFilters(searchInput.value, levelSelect.value));
+        levelSelect.addEventListener('change', () => applyFilters(searchInput.value, levelSelect.value));
+        
     } catch(error) {
         console.error(error);
     }
