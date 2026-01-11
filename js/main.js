@@ -1,9 +1,17 @@
 import { loadCourses } from './courses.js';
 import { loadTutors } from './tutors.js';
+import { initLogout } from './auth.js';
+
+if (!localStorage.getItem('api_key')) {
+  window.location.href = 'login.html';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   
-  // загрузка курсов
+  // Кнопка выхода
+  initLogout();
+
+  // Загрузка курсов
   loadCourses();
 
   // Фильтры репетиторов

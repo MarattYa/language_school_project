@@ -2,6 +2,10 @@ import { apiGet } from './api.js';
 import { createOrder } from './orders.js';
 import { getCoursesData,renderCoursesSimple } from './courses.js';
 
+if (!localStorage.getItem('api_key')) {
+  window.location.href = 'login.html';
+}
+
 const params = new URLSearchParams(window.location.search);
 const tutorId = Number(params.get('id'));
 if (!tutorId) {

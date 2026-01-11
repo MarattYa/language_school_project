@@ -1,6 +1,10 @@
 import { apiGet } from './api.js';
 import { createOrder } from './orders.js';
 
+if (!localStorage.getItem('api_key')) {
+  window.location.href = 'login.html';
+}
+
 /* ================== ID курса ================== */
 const params = new URLSearchParams(window.location.search);
 const courseId = Number(params.get('id'));
