@@ -27,22 +27,40 @@ export function createCourseCard(course) {
     `;
 }
 
-// Рендер текущей страницы + пагинация
-function renderCurrentPage() {
-    coursesList.innerHTML = '';
-    const start = (currentPage-1) * itemsPerPage;
-    const pageItems = filteredCourses.slice(start, start + itemsPerPage);
+// Рендер 
+function renderCourses(options = {}) {
+    const {
+        containerId = 'courses-list',
+        usePagination = true,
+        courses = filteredCourses
+    } = options;
 
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    
+    if(!usePagination) {
+        container.innerHTML = '';
+        courses.forEach(course => {
+            container.insertAdjacentHTML('beforeend',createCourseCard(course));
+        });
+        if (paginationContainer) paginationContainer.style.display = 'none';
+        return;
+    }
+
+    // с пагинацией
+    container.innerHTML = '';
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageItems = courses.slice(start, start+itemsPerPage);
     pageItems.forEach(course => {
-        coursesList.insertAdjacentHTML('beforeend', createCourseCard(course));
+        container.insertAdjacentHTML('beforeend', createCourseCard(course));
     });
-
-    renderPagination();
+    renderPagination(courses);
 }
 
-function renderPagination() {
+function renderPagination(courses = filteredCourses) {
+    if(!paginationContainer) return;
     paginationContainer.innerHTML = '';
-    const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+    const totalPages = Math.ceil(courses.length / itemsPerPage);
 
     for(let i=1;i<=totalPages;i++){
         const active = i===currentPage ? 'active' : '';
@@ -57,20 +75,20 @@ function renderPagination() {
         link.addEventListener('click', e => {
             e.preventDefault();
             currentPage = parseInt(e.target.textContent);
-            renderCurrentPage();
+            renderCurrentPage({courses});
         });
     });
 }
 
 // Фильтрация курсов
-function applyFilters(name='',level='') {
-    filteredCourses = coursesData.filter(course => {
+function applyFilters(name='',level='', courses = coursesData) {
+    filteredCourses = courses.filter(course => {
         const matchesName = course.name.toLowerCase().includes(name.toLowerCase());
         const matchesLevel = level ? course.level === level:true;
         return matchesName && matchesLevel;
     });
     currentPage = 1
-    renderCurrentPage();
+    renderCurrentPage({courses: filteredCourses, usePagination: true});
 }
 
 // Загрузка курсов
@@ -78,23 +96,37 @@ export async function loadCourses() {
     try {
         coursesData = await apiGet('/courses');
         filteredCourses = [...coursesData];
-        renderCurrentPage();
 
-        // Подключением фильтры формы
+        renderCourses({containerId: 'courses-list', usePagination: true});
+
         const searchInput = document.querySelector('#courses input[type="text"]');
         const levelSelect = document.querySelector('#courses select');
 
-        const form = searchInput.closest('form');
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            applyFilters(searchInput.value, levelSelect.value);
-        });
+        if(searchInput && levelSelect) {
+            const form = searchInput.closest('form');
 
-        // Фильтр в реальном времени при вводе текста
-        searchInput.addEventListener('input', () => applyFilters(searchInput.value, levelSelect.value));
-        levelSelect.addEventListener('change', () => applyFilters(searchInput.value, levelSelect.value));
-        
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                applyFilters(searchInput.value, levelSelect.value );
+            });
+
+            searchInput.addEventListener('input', () => applyFilters(searchInput.value, levelSelect.value));
+            levelSelect.addEventListener('change', () => applyFilters(searchInput.value, levelSelect.value));
+        }        
     } catch(error) {
         console.error(error);
     }
+}
+
+// ренден для старницы препода
+export function renderCoursesSimple(containerId, courses) {
+    renderCourses({ containerId, usePagination: false, courses});
+}
+
+// Получение всех курсов
+export async function getCoursesData() {
+    if(!coursesData.length) {
+        coursesData = await apiGet('/courses');
+    }
+    return coursesData;
 }

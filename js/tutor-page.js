@@ -1,5 +1,6 @@
 import { apiGet } from './api.js';
 import { createOrder } from './orders.js';
+import { getCoursesData,renderCoursesSimple } from './courses.js';
 
 const params = new URLSearchParams(window.location.search);
 const tutorId = Number(params.get('id'));
@@ -15,19 +16,24 @@ const experienceEl = document.getElementById('tutor-experience');
 const priceEl = document.getElementById('tutor-price');
 const descriptionEl = document.getElementById('tutor-description');
 const formEl = document.getElementById('tutor-order-form');
+const coursesContainerId = 'tutor-courses-list';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!formEl) {
-        console.error('Форма заявки не найдена');
-        return;
-    }
-
     try {
+        // Загружаем преподавателя
         const tutor = await apiGet(`/tutors/${tutorId}`);
         renderTutor(tutor);
+
+        // Загружаем все курсы и фильтруем по преподавателю
+        const allCourses = await getCoursesData();
+        const tutorCourses = allCourses.filter(course => course.teacher === tutor.name);
+
+        // Рендерим только курсы этого преподавателя
+        renderCoursesSimple(coursesContainerId, tutorCourses);
+
     } catch (err) {
-        console.error('Ошибка загрузки данных репетитора:', err);
-        alert('Ошибка загрузки данных репетитора');
+        console.error('Ошибка загрузки данных преподавателя или курсов:', err);
+        alert('Ошибка загрузки данных преподавателя');
     }
 });
 
