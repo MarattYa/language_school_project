@@ -1,96 +1,155 @@
-import { apiGet, apiPost } from './api.js';
+import { apiGet, apiPut, apiDelete } from './api.js';
 
-// DOM
 const ordersListEl = document.getElementById('orders-list');
-const editForm = document.getElementById('edit-order-form');
 const editModalEl = document.getElementById('editOrderModal');
+const editForm = document.getElementById('edit-order-form');
 
 let editModal = null;
+let currentOrders = [];
 
-// Загружаем заявки и показываем в таблице
-export async function loadOrders() {
+// Проверка авторизации
+if (!localStorage.getItem('api_key')) {
+  window.location.href = 'login.html';
+}
+
+// Инициализация модального окна и загрузка заявок
+document.addEventListener('DOMContentLoaded', async () => {
+  if (editModalEl) {
+    editModal = new bootstrap.Modal(editModalEl);
+  }
+
+  await loadOrders();
+});
+
+// Загрузка заявок с сервера
+async function loadOrders() {
   try {
-    const orders = await apiGet('/orders'); // Получаем все заявки
-    renderOrders(orders);
+    const orders = await apiGet('/orders');
+    currentOrders = orders;
+
+    const courseIds = [...new Set(orders.map(o => o.course_id).filter(Boolean))];
+    const tutorIds = [...new Set(orders.map(o => o.tutor_id).filter(Boolean))];
+
+    const coursesMap = {};
+    const tutorsMap = {};
+
+    await Promise.all(courseIds.map(async id => {
+      try {
+        const course = await apiGet(`/courses/${id}`);
+        coursesMap[id] = course;
+      } catch {
+        coursesMap[id] = { name: 'Не найден' };
+      }
+    }));
+
+    await Promise.all(tutorIds.map(async id => {
+      try {
+        const tutor = await apiGet(`/tutors/${id}`);
+        tutorsMap[id] = tutor;
+      } catch {
+        tutorsMap[id] = { name: 'Не найден' };
+      }
+    }));
+
+    // **Передаём карты в рендер**
+    renderOrders(orders, coursesMap, tutorsMap);
+
   } catch (err) {
-    console.error('Ошибка загрузки заказов:', err);
+    console.error('Ошибка загрузки заявок:', err);
+    ordersListEl.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Ошибка загрузки заявок</td></tr>`;
   }
 }
 
 // Рендер таблицы
-function renderOrders(orders) {
+function renderOrders(orders, coursesMap, tutorsMap) {
   ordersListEl.innerHTML = '';
 
   if (!orders.length) {
-    ordersListEl.innerHTML = `
-      <tr>
-        <td colspan="5" class="text-center text-muted">Нет заявок</td>
-      </tr>
-    `;
+    ordersListEl.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Нет заявок</td></tr>`;
     return;
   }
 
   orders.forEach(order => {
+    const courseOrTutor = order.course_id
+      ? coursesMap[order.course_id]?.name || '-'
+      : order.tutor_id
+      ? tutorsMap[order.tutor_id]?.name || '-'
+      : '-';
+
+    const price = order.price || '-';
+    const dateStart = order.date_start || '-';
+    const timeStart = order.time_start || '-';
+    const persons = order.persons || '-';
+    const duration = order.duration || '-';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${order.course?.name || '-'}</td>
-      <td>${order.customer_name}</td>
-      <td>${order.customer_email}</td>
-      <td>${order.status}</td>
+      <td>${courseOrTutor}</td>
+      <td>${price}</td>
+      <td>${dateStart}</td>
+      <td>${timeStart}</td>
+      <td>${persons}</td>
+      <td>${duration}</td>
       <td>
-        <button class="btn btn-sm btn-primary edit-btn" data-id="${order.id}">
-          Редактировать
-        </button>
+        <button class="btn btn-sm btn-primary edit-btn" data-id="${order.id}">Редактировать</button>
+        <button class="btn btn-sm btn-danger delete-btn" data-id="${order.id}">Удалить</button>
       </td>
     `;
     ordersListEl.appendChild(tr);
   });
 
-  // Навешиваем события на кнопки редактирования
+  // Обработчики кнопок
   ordersListEl.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const orderId = btn.dataset.id;
-      const order = orders.find(o => o.id == orderId);
-      if (!order) return;
-
-      document.getElementById('edit-order-id').value = order.id;
-      document.getElementById('edit-user-name').value = order.customer_name;
-      document.getElementById('edit-user-email').value = order.customer_email;
-      document.getElementById('edit-course-name').value = order.course?.name || '';
-      document.getElementById('edit-status').value = order.status;
-
-      editModal.show();
-    });
+    btn.addEventListener('click', () => openEditModal(Number(btn.dataset.id)));
+  });
+  ordersListEl.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteOrder(Number(btn.dataset.id)));
   });
 }
 
-// Редактирование заявки
+// Открытие модалки редактирования
+function openEditModal(orderId) {
+  const order = currentOrders.find(o => o.id === orderId);
+  if (!order) return;
+
+  document.getElementById('edit-order-id').value = order.id;
+  document.getElementById('edit-date-start').value = order.date_start || '';
+  document.getElementById('edit-time-start').value = order.time_start || '';
+  document.getElementById('edit-students-number').value = order.persons || 1;
+
+  editModal.show();
+}
+
+// Обновление заявки
 editForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const orderId = document.getElementById('edit-order-id').value;
+  const orderId = Number(document.getElementById('edit-order-id').value);
   const updatedData = {
-    customer_name: document.getElementById('edit-user-name').value.trim(),
-    customer_email: document.getElementById('edit-user-email').value.trim(),
-    status: document.getElementById('edit-status').value
+    date_start: document.getElementById('edit-date-start').value,
+    time_start: document.getElementById('edit-time-start').value,
+    persons: Number(document.getElementById('edit-students-number').value)
   };
 
   try {
-    await apiPost(`/orders/${orderId}`, updatedData); // обновляем заявку
-    alert('Заявка обновлена');
+    await apiPut(`/orders/${orderId}`, updatedData);
     editModal.hide();
-    loadOrders(); // перерисовываем таблицу
+    await loadOrders();
   } catch (err) {
-    console.error(err);
+    console.error('Ошибка при обновлении заявки:', err);
     alert('Ошибка при обновлении заявки');
   }
 });
 
-// Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-  if (editModalEl) {
-    editModal = new bootstrap.Modal(editModalEl);
-  }
+// Удаление заявки
+async function deleteOrder(orderId) {
+  if (!confirm('Вы уверены, что хотите удалить эту заявку?')) return;
 
-  loadOrders();
-});
+  try {
+    await apiDelete(`/orders/${orderId}`);
+    await loadOrders();
+  } catch (err) {
+    console.error('Ошибка при удалении заявки:', err);
+    alert('Ошибка при удалении заявки');
+  }
+}

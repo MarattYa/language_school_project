@@ -59,6 +59,15 @@ openModalBtn.addEventListener('click', () => {
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // Получаем значения из формы
+  const customerName = document.getElementById('user-name').value.trim();
+  const customerEmail = document.getElementById('user-email').value.trim();
+
+  if(!customerName || !customerEmail) {
+    alert('Введите имя и email')
+    return;
+  }
+
   const orderData = {
     course_id: currentCourse.id,
     tutor_id: 0,
@@ -76,6 +85,9 @@ orderForm.addEventListener('submit', async (e) => {
       currentCourse.course_fee_per_hour *
       currentCourse.total_length *
       currentCourse.week_length,
+    
+    customer_name: customerName,
+    customer_email: customerEmail,
 
     early_registration: false,
     group_enrollment: false,
