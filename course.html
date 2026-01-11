@@ -55,13 +55,18 @@
       <span id="course-week-length"></span> ч
     </li>
   </ul>
+  <!-- КНОПКА -->
+  <div class="text-center mt-4">
+    <button
+      id="open-order-modal"
+      class="btn btn-primary btn-lg px-5"
+      data-bs-toggle="modal"
+      data-bs-target="#orderModal"
+    >
+      Записаться на курс
+    </button>
+  </div>
 </section>
-
-<button
-  id="open-order-modal"
-  class="btn btn-primary btn-lg">
-  Записаться на курс
-</button>
 
 <div class="modal fade" id="orderModal" tabindex="-1">
   <div class="modal-dialog">
@@ -178,8 +183,30 @@
 </div>
 
 
-<footer class="border-top py-4 text-center text-muted">
-  © 2026 LinguaSpace
+<!-- ================= FOOTER ================= -->
+<footer class="footer border-top">
+  <div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+
+      <!-- Left side -->
+      <div class="text-muted small text-center text-md-start">
+        © 2026 LinguaSpace ·
+        <a href="#" class="footer-link">Imprint</a> ·
+        <a href="#" class="footer-link">Terms & Conditions</a> ·
+        <a href="#" class="footer-link">Privacy Statement</a> ·
+        <a href="#" class="footer-link">Do Not Sell or Share My Personal Information</a>
+      </div>
+
+      <!-- Right side -->
+      <div class="d-flex gap-3">
+        <a href="#" class="social-icon">F</a>
+        <a href="#" class="social-icon">▶</a>
+        <a href="#" class="social-icon">◎</a>
+        <a href="#" class="social-icon">in</a>
+      </div>
+
+    </div>
+  </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
