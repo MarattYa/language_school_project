@@ -1,12 +1,9 @@
 import { apiGet } from './api.js';
+import { createOrder } from './orders.js';
 
 const params = new URLSearchParams(window.location.search);
 const tutorId = Number(params.get('id'));
-
-if (!tutorId) {
-    alert('Репетитор не найден');
-    throw new Error('Tutor ID not provided');
-}
+if(!tutorId) { alert('Репетитор не найден'); throw new Error('Tutor ID missing'); }
 
 const nameEl = document.getElementById('tutor-name');
 const languagesEl = document.getElementById('tutor-languages');
@@ -17,20 +14,21 @@ const descriptionEl = document.getElementById('tutor-description');
 const coursesListEl = document.getElementById('tutor-courses');
 const courseSelectEl = document.getElementById('course-select');
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const tutor = await apiGet('/courses');
-        const tutorCourses = filterTutorCourses(courses,tutor);
+document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+        const tutor = await apiGet(`/tutors/${tutorId}`);
+        renderTutor(tutor);
+
+        const allCourses = await apiGet('/courses');
+        const tutorCourses = allCourses.filter(c => tutor.languages_offered.includes(c.language));
 
         renderCourses(tutorCourses);
         fillCourseSelect(tutorCourses);
-    } catch(error) {
-        console.error(error);
+    }catch(err){
+        console.error(err);
         alert('Ошибка загрузки');
     }
 });
-
-// рендер репетитора
 
 function renderTutor(tutor){
     nameEl.textContent = tutor.name;
@@ -38,73 +36,48 @@ function renderTutor(tutor){
     levelEl.textContent = tutor.language_level;
     experienceEl.textContent = tutor.work_experience;
     priceEl.textContent = tutor.price_per_hour;
-
-    descriptionEl.textContent = 
-        tutor.description || 'Опытный преподаватель иностранных яызков.';
+    descriptionEl.textContent = tutor.description || 'Описание отсутствует';
 }
-
-// filter курсов репетитора
-
-function filterTutorCourses(courses,tutor){
-    return courses.filter(course => 
-        tutor.languages_offered.includes(course.language)
-    );
-}
-
-// render courses
 
 function renderCourses(courses){
     coursesListEl.innerHTML = '';
-
-    if(courses.length === 0) {
-        coursesListEl.innerHTML =
-            '<li class="list-group-item text-muted">Нет доступных курсов</li>';
+    if(courses.length===0) {
+        coursesListEl.innerHTML = '<li class="list-group-item text-muted">Нет доступных курсов</li>';
         return;
     }
-
-    courses.forEach(course => {
-        coursesListEl.insertAdjacentHTML('beforeend', `
+    courses.forEach(c=>{
+        coursesListEl.insertAdjacentHTML('beforeend',`
             <li class="list-group-item">
-                <strong>${course.name}</strong><br>
-                <span class="text-muted">
-                    Уровень: ${course.level},
-                    Длительность: ${course.total_length} недель
-                </span>
+                <a href="course.html?id=${c.id}"><strong>${c.name}</strong></a> — Уровень: ${c.level}, Длительность: ${c.total_length} недель
             </li>
         `);
     });
 }
 
-// Заполнение select
-
-function fillCourseSelect(courses) {
-    courseSelectEl.innerHTML = 
-        '<option value="">Выберите курс</option>';
-
-    courses.forEach(course => {
-        courseSelectEl.insertAdjacentHTML('beforeend',`
-            <option value="${course.id}">
-                ${course.name}
-            </option>
-        `);
+function fillCourseSelect(courses){
+    courseSelectEl.innerHTML = '<option value="">Выберите курс</option>';
+    courses.forEach(c=>{
+        courseSelectEl.insertAdjacentHTML('beforeend', `<option value="${c.id}">${c.name}</option>`);
     });
 }
 
-document
-    .getElementById('tutor-order-form')
-    .addEventListener('submit', e => {
-        e.preventDefault();
+document.getElementById('tutor-order-form').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const form = e.target;
 
-        const orderData = {
-            tutorId,
-            courseId: courseSelectEl.ariaValueMax,
-            name: e.target[1].value,
-            email: e.target[2].value,
-            phone: e.target[3].value
-        };
+    const orderData = {
+        tutor_id: tutorId,
+        course_id: Number(courseSelectEl.value),
+        customer_name: form[1].value,
+        customer_email: form[2].value,
+        customer_phone: form[3].value
+    };
 
-        console.log('Заявка: ', orderData);
-
-        alert('Заявка отправлена (демо)');
-        e.target.removeEventListener();
-    });
+    const result = await createOrder(orderData);
+    if(result){
+        alert('Заявка отправлена');
+        form.reset();
+    }else{
+        alert('Ошибка при отправке заявки');
+    }
+});
