@@ -5,7 +5,7 @@ const paginationContainer = document.getElementById('courses-pagination');
 
 let coursesData = [];
 let currentPage = 1;
-const itemsPerPage = 5;
+const itemsPerPage = 6;
 
 // Создание карточки курса
 export function createCourseCard(course) {
